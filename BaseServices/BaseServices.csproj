@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DB492908-9959-45B2-ACED-60FC17458D06}</ProjectGuid>
+    <ProjectGuid>{043969D2-E908-4EB2-A294-9F66F40CC444}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Controller</RootNamespace>
-    <AssemblyName>Controller</AssemblyName>
+    <RootNamespace>BaseServices</RootNamespace>
+    <AssemblyName>BaseServices</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\OutPut\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,26 +24,23 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\OutPut\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BeeSys.Wasp.Communicator">
+      <HintPath>C:\Program Files (x86)\Beehive Systems Ltd\WASP3D\Ver3.5\Common\Shared Resources\BeeSys.Wasp.Communicator.dll</HintPath>
+    </Reference>
+    <Reference Include="BeeSys.Wasp.KernelController.IServices">
+      <HintPath>C:\Program Files (x86)\Beehive Systems Ltd\WASP3D\Ver3.5\Common\Shared Resources\BeeSys.Wasp.KernelController.IServices.dll</HintPath>
+    </Reference>
     <Reference Include="BeeSys.Wasp.KernelController.IUDTManager">
       <HintPath>C:\Program Files (x86)\Beehive Systems Ltd\WASP3D\Ver3.5\Common\Shared Resources\BeeSys.Wasp.KernelController.IUDTManager.dll</HintPath>
     </Reference>
-    <Reference Include="BeeSys.Wasp3D.Controls2">
-      <HintPath>C:\Program Files (x86)\Beehive Systems Ltd\WASP3D\Ver3.5\Common\Shared Resources\BeeSys.Wasp3D.Controls2.dll</HintPath>
-    </Reference>
-    <Reference Include="BeeSys.Wasp3D.Designer.WFilterControl, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Beehive Systems Ltd\WASP3D\Ver3.5\Common\Shared Resources\BeeSys.Wasp3D.Designer.WFilterControl.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,23 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controller.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controller.Designer.cs">
-      <DependentUpon>Controller.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Imatch.cs" />
+    <Compile Include="IPlayer.cs" />
+    <Compile Include="ITeam.cs" />
+    <Compile Include="IUDTDataProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controller.resx">
-      <DependentUpon>Controller.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Team\Team.csproj">
-      <Project>{41734eef-d9b7-45f0-b7de-d096d55974d4}</Project>
-      <Name>Team</Name>
+    <ProjectReference Include="..\UDTProvider\UDTProvider.csproj">
+      <Project>{bfa81bc4-2ed7-48ed-935b-045265a4d60c}</Project>
+      <Name>UDTProvider</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

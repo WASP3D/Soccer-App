@@ -1,6 +1,6 @@
 ﻿namespace Controller
 {
-    partial class Controller
+    partial class Match
     {
         /// <summary> 
         /// Required designer variable.
@@ -190,6 +190,7 @@
             this.button3.TabIndex = 23;
             this.button3.Text = "...";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button4
             // 
@@ -200,8 +201,9 @@
             this.button4.TabIndex = 24;
             this.button4.Text = "....";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // Controller
+            // Match
             // 
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
@@ -218,7 +220,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
-            this.Name = "Controller";
+            this.Name = "Match";
             this.Size = new System.Drawing.Size(1279, 92);
             this.ResumeLayout(false);
             this.PerformLayout();

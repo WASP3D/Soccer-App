@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\OutPut\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\OutPut\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -48,11 +48,26 @@
     <Compile Include="Team.Designer.cs">
       <DependentUpon>Team.cs</DependentUpon>
     </Compile>
+    <Compile Include="TeamBuilderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TeamBuilderForm.Designer.cs">
+      <DependentUpon>TeamBuilderForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Team.resx">
       <DependentUpon>Team.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="TeamBuilderForm.resx">
+      <DependentUpon>TeamBuilderForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UDTProvider\UDTProvider.csproj">
+      <Project>{bfa81bc4-2ed7-48ed-935b-045265a4d60c}</Project>
+      <Name>UDTProvider</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

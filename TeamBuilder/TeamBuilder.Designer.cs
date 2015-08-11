@@ -146,12 +146,13 @@
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dataGridView1);
-            this.Name = "TeamBuilder";
+           
             this.Size = new System.Drawing.Size(731, 502);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
 
         }
 

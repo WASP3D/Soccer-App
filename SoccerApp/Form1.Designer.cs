@@ -28,73 +28,78 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            UDTProvider.UDTProvider udtProvider1 = new UDTProvider.UDTProvider();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+          //  BeeSys.Wasp.KernelController.CUdtArgs cUdtArgs1 = new BeeSys.Wasp.KernelController.CUdtArgs();
+            this.match1 = new Controller.Match();
             this.team1 = new Team.Team();
             this.team2 = new Team.Team();
-            this.controller1 = new Controller.Controller();
-            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // match1
             // 
-            this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.42234F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.57766F));
-            this.tableLayoutPanel1.Controls.Add(this.team1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.team2, 1, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 103);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 61.88925F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1550, 589);
-            this.tableLayoutPanel1.TabIndex = 7;
+            this.match1.AwayTeamGoal = 0;
+            this.match1.HomeTeamGoal = 0;
+            this.match1.Location = new System.Drawing.Point(1, 12);
+            this.match1.Name = "match1";
+            this.match1.selectedMatch = null;
+            this.match1.selectedMatchPart = null;
+            this.match1.Size = new System.Drawing.Size(1279, 92);
+            this.match1.TabIndex = 0;
+            /*cUdtArgs1.ACTIONNAME = null;
+            cUdtArgs1.DATA = resources.GetString("cUdtArgs1.DATA");
+            cUdtArgs1.DataXmlVersion = "0";
+            cUdtArgs1.DATE = null;
+            cUdtArgs1.FORMAT = resources.GetString("cUdtArgs1.FORMAT");
+            cUdtArgs1.ID = "06ee4e8b-f20f-4b61-8c60-2a4478d19f01";
+            cUdtArgs1.IsInsert = false;
+            cUdtArgs1.Lock = false;
+            cUdtArgs1.NAME = "Soccer";
+            cUdtArgs1.OldUdtId = null;
+            cUdtArgs1.Published = false;
+            cUdtArgs1.SessionId = null;
+            cUdtArgs1.TableFormat = resources.GetString("cUdtArgs1.TableFormat");
+            cUdtArgs1.UDTTABLE = null;
+            cUdtArgs1.USER = null;
+            cUdtArgs1.XsdVersion = "0";
+            udtProvider1.CurrentUDT = cUdtArgs1;*/
+            this.match1.Udt = udtProvider1;
             // 
             // team1
             // 
-            this.team1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.team1.Location = new System.Drawing.Point(4, 4);
+            this.team1.Location = new System.Drawing.Point(12, 127);
             this.team1.Name = "team1";
-            this.team1.Size = new System.Drawing.Size(758, 581);
-            this.team1.TabIndex = 0;
+            this.team1.Size = new System.Drawing.Size(654, 358);
+            this.team1.TabIndex = 1;
+            this.team1.TeamType = null;
             // 
             // team2
             // 
-            this.team2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.team2.Location = new System.Drawing.Point(769, 4);
+            this.team2.Location = new System.Drawing.Point(689, 145);
             this.team2.Name = "team2";
-            this.team2.Size = new System.Drawing.Size(777, 581);
-            this.team2.TabIndex = 1;
-            // 
-            // controller1
-            // 
-            this.controller1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.controller1.Location = new System.Drawing.Point(0, 0);
-            this.controller1.Name = "controller1";
-            this.controller1.Size = new System.Drawing.Size(1550, 692);
-            this.controller1.TabIndex = 0;
+            this.team2.Size = new System.Drawing.Size(654, 358);
+            this.team2.TabIndex = 2;
+            this.team2.TeamType = null;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1550, 692);
-            this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.controller1);
+            this.ClientSize = new System.Drawing.Size(1426, 539);
+            this.Controls.Add(this.team2);
+            this.Controls.Add(this.team1);
+            this.Controls.Add(this.match1);
             this.Name = "Form1";
-            this.Text = "Soccer Form";
-            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private Controller.Controller controller1;
+        private Controller.Match controller1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private Controller.Match match1;
         private Team.Team team1;
         private Team.Team team2;
+       
 
 
     }
