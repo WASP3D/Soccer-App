@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SoccerApp</RootNamespace>
     <AssemblyName>SoccerApp</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -233,8 +233,11 @@
     <EmbeddedResource Include="TeamSelection.resx">
       <DependentUpon>TeamSelection.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Docs\soccer doc.odt" />
-    <None Include="packages.config" />
+    <None Include="Docs\Wasp3D Soccer Application.pdf" />
+    <None Include="Graphics\SoccerScenes\Soccer Template.wcz" />
+    <None Include="Graphics\UDT\Soccer League Table.udt" />
+    <None Include="Graphics\UDT\Soccer Match Schedule.udt" />
+    <None Include="Graphics\UDT\Soccer Match.udt" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -244,20 +247,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Resources\SoccerScenes\League Table.w3d" />
-    <None Include="Resources\SoccerScenes\Match FT Summary Statistics.w3d" />
-    <None Include="Resources\SoccerScenes\Team Line Up.w3d" />
-    <None Include="Resources\SoccerScenes\Team Line Up_Players.w3d" />
-    <None Include="Resources\SoccerScenes\Team Roster.w3d" />
-    <None Include="Resources\UDT\Soccer League Table.udt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UDT\Soccer Match Schedule.udt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\UDT\Soccer Match.udt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -271,48 +260,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\SoccerScenes\BackGround.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Field Formation.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Head To Head.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Match Lowerthird.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Match Schedule.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Match Score_LT.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Official Band_LT.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Player Profile.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\Refree Band.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SoccerScenes\ScoreBug.w3d">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\Soccer_revised.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\BeeSys.Wasp.IWaspPlayers.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BeeSys.Wasp.KernelController.TemplateManager.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Beesys.Wasp.SceneReader.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\soccer_ball.ico" />
     <Content Include="templates.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -331,15 +281,22 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist ..\..\OutPut mkdir ..\..\OutPut
 copy "$(TargetDir)*.dll" "..\..\OutPut\"
+if not exist ..\..\Graphics mkdir ..\..\Graphics
+if not exist ..\..\Docs mkdir ..\..\Docs
 copy "$(TargetDir)SoccerApp.exe" "..\..\OutPut\SoccerApp.exe"
 copy "$(TargetDir)SoccerApp.exe.config" "..\..\OutPut\SoccerApp.exe.config"
 copy "$(ProjectDir)templates.xml" "..\..\OutPut\templates.xml"
 if not exist ..\..\OutPut\Resources mkdir ..\..\OutPut\Resources
-if not exist ..\..\OutPut\Resources\SoccerScenes mkdir ..\..\OutPut\Resources\SoccerScenes
+if not exist ..\..\OutPut\Resources\Graphics mkdir ..\..\OutPut\Resources\Graphics
+if not exist ..\..\Graphics mkdir ..\..\Graphics
 if not exist ..\..\OutPut\Resources\UDT mkdir ..\..\OutPut\Resources\UDT
-copy "..\Resources\*.dll" "..\..\OutPut\Resources\"
-copy "..\Resources\SoccerScenes\*.w3d" "..\..\OutPut\Resources\SoccerScenes\"
-copy "..\Resources\UDT\*.udt" "..\..\OutPut\Resources\UDT\"</PostBuildEvent>
+copy "..\Graphics\SoccerScenes\*.w3d" "..\..\OutPut\Resources\Graphics\"
+copy "..\Graphics\SoccerScenes\*.wcz" "..\..\OutPut\Resources\Graphics\"
+copy "..\Graphics\SoccerScenes\*.w3d" "..\..\Graphics\"
+copy "..\Graphics\SoccerScenes\*.wcz" "..\..\Graphics\"
+copy "..\Resources\*.w3d" "..\..\OutPut\Resources\"
+copy "..\Docs\*.pdf" "..\..\Docs\"
+copy "..\Graphics\UDT\*.udt" "..\..\OutPut\Resources\UDT\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -512,7 +512,7 @@ namespace SoccerApp
             {
                 string columnname = column;
                 ScenInfo si = m_lstSceneCollection.Where(s => s.Description == str).FirstOrDefault();
-                TemplateInfo obj = objPlayergetter.GetPlayerInfo(si.Id);
+                Beesys.Wasp.Workflow.TemplateInfo obj = objPlayergetter.GetPlayerInfo(si.Id);
                 m_objPlayer = Activator.CreateInstance(obj.TemplatePlayerInfo) as IPlayer;
                 Form objfrm = m_objPlayer as Form;
                 SetMatchUdt(objfrm);
@@ -1763,7 +1763,7 @@ namespace SoccerApp
                     case "Load BG":
                         BtnLoadBG.Text = "Unload BG";
                         ScenInfo si = m_lstSceneCollection.Where(s => s.Description == "bg").FirstOrDefault();
-                        TemplateInfo tempinfo = objPlayergetter.GetPlayerInfo(si.Id);
+                        Beesys.Wasp.Workflow.TemplateInfo tempinfo = objPlayergetter.GetPlayerInfo(si.Id);
                         m_objsceneHandler.LoadBackground(tempinfo, si.Id);
                         break;
                     case "Unload BG":
