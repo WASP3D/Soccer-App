@@ -18,6 +18,10 @@ namespace SoccerApp
         public string ParentName { get; set; }
         public bool IsTeamSelected = false;
 
+        public object SelectedTeamId { get; set; }
+
+        public object SelectedPlayerId { get; set; }
+
         public PlayerDetails()
         {
             InitializeComponent();
@@ -28,9 +32,10 @@ namespace SoccerApp
             SetFormHeader();
             AutoCompleteStringCollection cmbstrName = new AutoCompleteStringCollection();
             AutoCompleteStringCollection cmbstrJer = new AutoCompleteStringCollection();
-            DataRow drTeam = ObjUdtprovider.CurrentDataSet.Tables[2].Select("Name = '" + Team+"'").FirstOrDefault();
+            DataRow drTeam = ObjUdtprovider.CurrentDataSet.Tables[2].Select("Name = '" + Team + "'").FirstOrDefault();
             if (drTeam != null)
             {
+                SelectedTeamId = drTeam["T24_ID"];
                 DataRow[] drPlayers = ObjUdtprovider.CurrentDataSet.Tables[3].Select("T24_ID = '" + drTeam["T24_ID"] + "' AND Playing=true");
                 cmbPlayerJer.Items.Clear();
                 cmbPlayerName.Items.Clear();
@@ -68,7 +73,7 @@ namespace SoccerApp
         {
             Team = cmbTeam.Text;
             Initialize();
-            if(!string.IsNullOrEmpty(cmbTeam.Text))
+            if (!string.IsNullOrEmpty(cmbTeam.Text))
             {
                 IsTeamSelected = true;
             }
@@ -81,6 +86,11 @@ namespace SoccerApp
         private void cmbPlayerName_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelectedPlayer = cmbPlayerName.Text;
+            DataRow drPlayer = ObjUdtprovider.CurrentDataSet.Tables[3].Select("T24_ID = '" + SelectedTeamId + "' AND Playing=true AND [First Name]='" + SelectedPlayer + "'").FirstOrDefault();
+            if (drPlayer != null)
+            {
+                SelectedPlayerId = drPlayer["T25_ID"];
+            }
             cmbPlayerJer.SelectedIndex = cmbPlayerName.SelectedIndex;
         }
 

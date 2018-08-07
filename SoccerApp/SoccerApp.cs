@@ -16,6 +16,10 @@ using System.Xml;
 using BeeSys.Wasp3D.FormDesigner2;
 using BeeSys.Wasp3D.Controls2;
 using System.Reflection;
+using Microsoft.Win32;
+using System.Net;
+using System.Diagnostics;
+
 namespace SoccerApp
 {
     public partial class SoccerApp : Form
@@ -39,11 +43,12 @@ namespace SoccerApp
         private string MATCHUDTID = string.Empty;
         private IPlayer m_objplayertodelete = null;
         private PlayerGetter objPlayergetter = null;
-        private const string m_surlformat = "net.tcp://{0}:{1}/TcpBinding/WcfTcpLink";
-        private string m_serverurl = string.Empty;
         private string hometeamshortname = string.Empty;
         private string awayteamshortname = string.Empty;
         private readonly bool isformloaded = false;
+        private string ServiceUrlKey = string.Empty;
+
+        BindingList<EngineData> lstEngines = null;
 
         #endregion
 
@@ -54,16 +59,84 @@ namespace SoccerApp
             try
             {
                 InitializeComponent();
+                ConfigHandler.Initilaize();
+
+                SetServiceUrlKey();
                 Init();
                 isformloaded = true;
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
+            }
+        }
+
+        public void ShutDown()
+        {
+            try
+            {
+                Debug.WriteLine("Soccer App-->SoccerApp ShutDown");
+                if (m_objUDTMatchSchedule != null)
+                {
+                    m_objUDTMatchSchedule.Dispose();
+                    m_objUDTMatchSchedule = null;
+                }
+                if (m_objUDTMatch != null)
+                {
+                    m_objUDTMatch.Dispose();
+                    m_objUDTMatch = null;
+                }
+                if (m_objWaspFileHandler != null)
+                {
+                    m_objWaspFileHandler.Dispose();
+                    m_objWaspFileHandler = null;
+                }
+                if (m_objRemoteHelper != null)
+                {
+                    m_objRemoteHelper.Dispose();
+                    m_objRemoteHelper = null;
+                }
+                if (m_objsceneHandler != null)
+                {
+                    m_objsceneHandler.Dispose();
+                    m_objsceneHandler = null;
+                }
+                if (m_lstSceneCollection != null)
+                {
+                    m_lstSceneCollection.Clear();
+                    m_lstSceneCollection = null;
+                }
+                if (m_objsceneHandler != null)
+                {
+                    m_objsceneHandler.Dispose();
+                    m_objsceneHandler = null;
+                }
+                if (m_objPlayer != null)
+                {
+                    m_objPlayer.DeleteSg();
+                    m_objPlayer.Dispose();
+                    m_objPlayer = null;
+                }
+                if (m_objplayertodelete != null)
+                {
+                    m_objplayertodelete.DeleteSg();
+                    m_objplayertodelete.Dispose();
+                    m_objplayertodelete = null;
+                }
+                if (objPlayergetter != null)
+                {
+                    objPlayergetter = null;
+                }
+                this.Dispose();
+            }
+            catch(Exception ex)
+            {
+
             }
         }
 
         #endregion
+
 
         #region Private Methods
 
@@ -74,16 +147,29 @@ namespace SoccerApp
         {
             try
             {
-                m_serverurl = string.Format(m_surlformat, ConfigurationManager.AppSettings["stingserverip"], ConfigurationManager.AppSettings["stingserverport"]);
                 m_objWaspFileHandler = new CWaspFileHandler();
-                m_objsceneHandler = new SceneHandler();
                 objPlayergetter = new PlayerGetter();
                 SetUI();
                 InitializeWasp();
-                InitilizeMatchScheduleUdt();
-                InitializeCombos();
-                FillMatchDetails();
-                Fillgrid();
+                if (InitilizeMatchScheduleUdt())
+                {
+                    InitializeCombos();
+                    FillMatchDetails();
+                    Fillgrid();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
+            }
+        }
+
+        void InitSceneHandler()
+        {
+            try
+            {
+
+                m_objsceneHandler = new SceneHandler();
                 m_objsceneHandler.FileHandler = m_objWaspFileHandler;
                 m_objsceneHandler.Initialize();
                 m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
@@ -94,7 +180,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+
             }
         }
 
@@ -107,7 +193,7 @@ namespace SoccerApp
             pnlHmTeam.BackColor = Color.FromArgb(228, 228, 228);
             pnlAwayTeam.BackColor = Color.FromArgb(228, 228, 228);
             pnlcntr.BackColor = Color.FromArgb(228, 228, 228);
-            pnlMActions.BackColor = Color.FromArgb(86, 110, 123);
+            //pnlMActions.BackColor = Color.FromArgb(86, 110, 123);
             btnFoul.BackColor = Color.FromArgb(182, 182, 182);
             btnYellow.BackColor = Color.FromArgb(182, 182, 182);
             btnShots.BackColor = Color.FromArgb(182, 182, 182);
@@ -115,14 +201,14 @@ namespace SoccerApp
             btnCorner.BackColor = Color.FromArgb(182, 182, 182);
             btnRed.BackColor = Color.FromArgb(182, 182, 182);
             btnSubstitute.BackColor = Color.FromArgb(182, 182, 182);
-            pnlPlay.BackColor = Color.FromArgb(86, 109, 123);
-            pnlActions.BackColor = Color.FromArgb(86, 109, 123);
+            //pnlPlay.BackColor = Color.FromArgb(86, 109, 123);
+            //pnlActions.BackColor = Color.FromArgb(86, 109, 123);
             dgvMatchevents.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(176, 174, 175);
             dgvMatchevents.EnableHeadersVisualStyles = false;
             lblCounter.BackColor = Color.FromArgb(228, 228, 228);
             cmbMatch.BackColor = Color.FromArgb(182, 182, 182);
             cmbMatchPart.BackColor = Color.FromArgb(182, 182, 182);
-            pnlActions.BackColor = Color.FromArgb(196, 196, 196);
+            //pnlActions.BackColor = Color.FromArgb(196, 196, 196);
             pnlLabels.BackColor = Color.FromArgb(86, 109, 123);
             lblMatchevents.ForeColor = Color.FromArgb(51, 51, 51);
             pnlMatch.BackColor = Color.FromArgb(196, 196, 196);
@@ -139,18 +225,35 @@ namespace SoccerApp
             try
             {
                 m_sCommonPath = Environment.GetEnvironmentVariable("Wasp3.5");
-                System.Diagnostics.Debug.WriteLine("InitializeWasp Commonpath:" + m_sCommonPath);
+                WriteTrace("InitializeWasp Commonpath:" + m_sCommonPath);
                 var configfile = Path.Combine(m_sCommonPath, "CommonConfig.config");
-                System.Diagnostics.Debug.WriteLine("InitializeWasp configfile:" + configfile);
+                WriteTrace("InitializeWasp configfile:" + configfile);
                 XDocument xdoc = XDocument.Load(configfile);
                 var url = from lv1 in xdoc.Descendants("add")
-                          where lv1.Attribute("key").Value == "LOCALMANAGERURL"
+                          where lv1.Attribute("key").Value == ServiceUrlKey
                           select lv1.Attribute("value").Value;
-                System.Diagnostics.Debug.WriteLine("InitializeWasp Url:" + url.ElementAt(0));
+                WriteTrace("InitializeWasp Url:" + url.ElementAt(0));
                 m_objRemoteHelper = new CRemoteHelper(url.ElementAt(0));
                 ConnectionInfo info = m_objRemoteHelper.CheckConnection();
                 if (info.status == Status.Connected)
                 {
+                    CKCMessenger objMessenger = CKCMessenger.GetKCMessenger(Beesys.Wasp.Wokrflow.WaspModuleNames.StingClient, url.ElementAt(0), IPAddress.Parse(info.connectionStatus.MulticastIP), Convert.ToInt32(info.connectionStatus.MulticastPort), false, CKCMessenger.ServerUpdates.Required);
+                    var servers = objMessenger.PlayoutServers;
+                    servers.Register += Servers_Register;
+                    servers.UnRegister += Servers_UnRegister;
+                    WriteTrace("Count->" + servers.PlayoutServers.Count);
+                    lstEngines = new BindingList<EngineData>();
+                    lstEngines.Add(new EngineData { Name = "--Select--" });
+                    foreach (var server in servers.PlayoutServers)
+                    {
+                        lstEngines.Add(new EngineData { Name = server.EngineName, IP = server.EnigneIP, WcfUrl = server.WcfUrl });
+                    }
+
+                    cmbxEngines.DataSource = lstEngines;
+                    cmbxEngines.DisplayMember = "Name";
+                    cmbxEngines.ValueMember = "Name";
+                    cmbxEngines.SelectedValue = "--Select--";
+
                     ServiceUrl templatemgrserviceurl = CRemoteHelper.GetDisconnectedUrl("TemplateManager");
                     m_objWaspFileHandler = new CWaspFileHandler();
                     m_objWaspFileHandler.Initialize(templatemgrserviceurl);
@@ -159,7 +262,69 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
+            }
+        }
+
+        private void Servers_UnRegister(PlayoutRemoveArgs unregisteritem)
+        {
+            if (unregisteritem != null)
+            {
+                WriteTrace("Servers_UnRegister,EngineName->" + unregisteritem.EngineName);
+                EngineData disconnectedEngine = lstEngines.FirstOrDefault(c => c.Name == unregisteritem.EngineName && c.IP == unregisteritem.EngineIP);
+                if (disconnectedEngine != null)
+                {
+                    if (cmbxEngines.InvokeRequired)
+                    {
+                        cmbxEngines.Invoke((MethodInvoker)delegate
+                        {
+                            lstEngines.Remove(disconnectedEngine);
+                        });
+                    }
+                    else
+                    {
+                        lstEngines.Remove(disconnectedEngine);
+                    }
+                }
+            }
+        }
+
+        private void Servers_Register(IPlayoutServer objPlayoutServer)
+        {
+            if (objPlayoutServer != null)
+            {
+                WriteTrace("Servers_Register,EngineName->" + objPlayoutServer.EngineName);
+
+                if (cmbxEngines.InvokeRequired)
+                {
+                    cmbxEngines.Invoke((MethodInvoker)delegate
+                    {
+                        lstEngines.Add(new EngineData { Name = objPlayoutServer.EngineName, IP = objPlayoutServer.EnigneIP, WcfUrl = objPlayoutServer.WcfUrl });
+                    });
+                }
+                else
+                {
+                    lstEngines.Add(new EngineData { Name = objPlayoutServer.EngineName, IP = objPlayoutServer.EnigneIP, WcfUrl = objPlayoutServer.WcfUrl });
+                }
+            }
+        }
+
+        private void SetServiceUrlKey()
+        {
+            RegistryKey rgKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            RegistryKey key;
+            try
+            {
+                key = rgKey.OpenSubKey(Environment.Is64BitOperatingSystem ? @"SOFTWARE\Wow6432Node\Beehive Systems Ltd\Wasp3D" : @"SOFTWARE\Beehive Systems Ltd\Wasp3D");
+                if (key != null)
+                {
+                    var modules = key.GetSubKeyNames();
+                    ServiceUrlKey = key.GetSubKeyNames().Any(c => c.ToLower().Trim().Contains("community")) ? "LOCALMANAGERURL" : "REMOTEMANAGERURL";
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -174,7 +339,10 @@ namespace SoccerApp
                 {
                     m_lstSceneCollection = new List<ScenInfo>();
                 }
-                XDocument xdoc = XDocument.Load("templates.xml");
+                string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string xmlFileName = Path.Combine(assemblyFolder, "templates.xml");
+
+                XDocument xdoc = XDocument.Load(xmlFileName);
                 var templates = xdoc.Descendants("template");
                 foreach (var item in templates)
                 {
@@ -192,33 +360,51 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
         /// <summary>
         /// Initialize SoccerMatchSchedule udt by creating its UdtProvider object
         /// </summary>
-        private void InitilizeMatchScheduleUdt()
+        private bool InitilizeMatchScheduleUdt()
         {
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["udtname"]))
+            bool bResult = false;
+
+            try
             {
-                try
+                if (string.IsNullOrEmpty(ConfigHandler.AppSettings.Settings["udtname"].Value))
+                {
+                    MessageBox.Show("Udtname in config cannot be blank.", "Mandatory", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                }
+                else
                 {
                     if (m_objUDTMatchSchedule != null)
                     {
                         m_objUDTMatchSchedule.Dispose();
                         m_objUDTMatchSchedule = null;
                     }
-                    m_objUDTMatchSchedule = new UDTProvider.UdtProvider();
-                    m_objUDTMatchSchedule.InitializeConnection();
-                    m_objUDTMatchSchedule.InitializeUdt(ConfigurationManager.AppSettings["udtname"]);
-                }
-                catch (Exception ex)
-                {
-                    LogWriter.WriteLog(ex);
+                    m_objUDTMatchSchedule = new UDTProvider.UdtProvider(ServiceUrlKey);
+                    if (!m_objUDTMatchSchedule.InitializeConnection())
+                    {
+                        MessageBox.Show("Not able to create KC connection.", "Mandatory", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        if (!m_objUDTMatchSchedule.InitializeUdt(ConfigHandler.AppSettings.Settings["udtname"].Value))
+                        {
+                            MessageBox.Show("Not able to get udt list.", "Mandatory", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+                        }
+                        else
+                            bResult = true;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
+            }
+            return bResult;
         }
 
         /// <summary>
@@ -233,7 +419,7 @@ namespace SoccerApp
                     m_objUDTMatch.Dispose();
                     m_objUDTMatch = null;
                 }
-                m_objUDTMatch = new UDTProvider.UdtProvider();
+                m_objUDTMatch = new UDTProvider.UdtProvider(ServiceUrlKey);
                 m_objUDTMatch.InitializeConnection();
                 m_objUDTMatch.InitializeUdt(MATCHUDTNAME);
                 MATCHUDTID = m_objUDTMatch.CnctArgs.Udtid;
@@ -256,7 +442,7 @@ namespace SoccerApp
             FillMatchList();
             cmbMatchPart.AutoCompleteMode = AutoCompleteMode.Suggest;
             cmbMatchPart.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cmbMatchPart.SelectedIndex = 0;
+            cmbMatchPart.SelectedIndex = -1;
 
             // Get the Match part List from UDT and add to cmbstr1, Fill the Combo, and set the selected Item
         }
@@ -304,7 +490,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -318,13 +504,14 @@ namespace SoccerApp
             {
                 DataSet dt = m_objUDTMatchSchedule.CurrentDataSet;
                 var dtmatch = dt.Tables[1];
-                DataRow[] dr = dtmatch.Select("Active=true");
-                MATCHUDTNAME = dr[0]["UDT Name"].ToString();
+                //DataRow[] dr = dtmatch.Select("Active=true");
+                DataRow dr = dtmatch.AsEnumerable().FirstOrDefault(r => r.Field<bool>("Active") == true);
+                MATCHUDTNAME = dr["UDT Name"].ToString();
                 InitializeMatchUdt();
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -359,7 +546,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -390,7 +577,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -411,15 +598,18 @@ namespace SoccerApp
                     hometeamshortname = dtteams.Rows[0]["Short Name_HT"].ToString();
                     awayteamshortname = dtteams.Rows[0]["Short Name_AT"].ToString();
                 }
-                m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
-                m_objsceneHandler.Awayteamscore = lblAwayScore.Text;
-                m_objsceneHandler.Hometeamshortname = hometeamshortname;
-                m_objsceneHandler.Awayteamshortname = awayteamshortname;
-                m_objsceneHandler.SetMatchUdt();
+                if (m_objsceneHandler != null)
+                {
+                    m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
+                    m_objsceneHandler.Awayteamscore = lblAwayScore.Text;
+                    m_objsceneHandler.Hometeamshortname = hometeamshortname;
+                    m_objsceneHandler.Awayteamshortname = awayteamshortname;
+                    m_objsceneHandler.SetMatchUdt();
+                }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -462,7 +652,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
 
         }
@@ -496,7 +686,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
 
         }
@@ -516,7 +706,7 @@ namespace SoccerApp
                 m_objPlayer = Activator.CreateInstance(obj.TemplatePlayerInfo) as IPlayer;
                 Form objfrm = m_objPlayer as Form;
                 SetMatchUdt(objfrm);
-                if (m_objPlayer != null)
+                if (m_objPlayer != null && m_objsceneHandler != null)
                 {
                     m_objPlayer.Init("", "", si.Id, "");
                     m_objPlayer.SetLink(m_objsceneHandler.AppLink, obj.MetaDataXml);
@@ -534,11 +724,11 @@ namespace SoccerApp
                     IChannelShotBox objChannelShotBox = m_objPlayer as IChannelShotBox;
                     if (objChannelShotBox != null)
                     {
-                        objChannelShotBox.SetEngineUrl(m_serverurl);
+                        objChannelShotBox.SetEngineUrl(ConfigHandler.Engine.TcpUrl);
                     }
 
                     m_objPlayer.OnShotBoxControllerStatus += objPlayer_OnShotBoxControllerStatus;
-                    m_objPlayer.Prepare(m_serverurl, Convert.ToInt32(m_objPlayer.ZORDER), string.Empty, RENDERMODE.PROGRAM);
+                    m_objPlayer.Prepare(ConfigHandler.Engine.TcpUrl, Convert.ToInt32(m_objPlayer.ZORDER), string.Empty, RENDERMODE.PROGRAM);
                 }
                 if (columnname != "-1")
                 {
@@ -549,43 +739,43 @@ namespace SoccerApp
                     Control ctl2 = null;
                     if (string.Compare(columnname, "Column2", StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        ctl = tableLayoutPanel1.GetControlFromPosition(0, 0);
+                        ctl = tableLayoutPanelPlayers.GetControlFromPosition(0, 0);
                         if (ctl != null) // Already control present there
                         {
                             //First play out the graphic.
                             //then delete the gfx                            
-                            tableLayoutPanel1.Controls.Remove(ctl);
+                            tableLayoutPanelPlayers.Controls.Remove(ctl);
                             (ctl as IPlayer).DeleteSg();
-                            tableLayoutPanel1.Controls.Add(objfrm, 0, 0);
+                            tableLayoutPanelPlayers.Controls.Add(objfrm, 0, 0);
                         }
                     }
 
                     if (string.Compare(columnname, "Column3", StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        ctl2 = tableLayoutPanel1.GetControlFromPosition(1, 0);
+                        ctl2 = tableLayoutPanelPlayers.GetControlFromPosition(1, 0);
                         if (ctl2 != null) // Already control present there
                         {
                             //First play out the graphic.
                             //then delete the gfx
-                            tableLayoutPanel1.Controls.Remove(ctl2);
+                            tableLayoutPanelPlayers.Controls.Remove(ctl2);
                             (ctl2 as IPlayer).DeleteSg();
-                            tableLayoutPanel1.Controls.Add(objfrm, 1, 0);
+                            tableLayoutPanelPlayers.Controls.Add(objfrm, 1, 0);
                         }
                     }
-                    if (ctl == null && (string.Compare(columnname, "Column2",StringComparison.OrdinalIgnoreCase) == 0))
+                    if (ctl == null && (string.Compare(columnname, "Column2", StringComparison.OrdinalIgnoreCase) == 0))
                     {
-                        tableLayoutPanel1.Controls.Add(objfrm, 0, 0);
+                        tableLayoutPanelPlayers.Controls.Add(objfrm, 0, 0);
                     }
                     else if (ctl2 == null && (string.Compare(columnname, "Column3", StringComparison.OrdinalIgnoreCase) == 0))
                     {
-                        tableLayoutPanel1.Controls.Add(objfrm, 1, 0);
+                        tableLayoutPanelPlayers.Controls.Add(objfrm, 1, 0);
                     }
                     objfrm.Show();
                 }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -668,7 +858,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -691,7 +881,7 @@ namespace SoccerApp
                     break;
                 }
             }
-            if (isAllfalse && tableLayoutPanel1.GetControlFromPosition(columnpos, 0) != null)
+            if (isAllfalse && tableLayoutPanelPlayers.GetControlFromPosition(columnpos, 0) != null)
             {
                 return true;
             }
@@ -731,6 +921,14 @@ namespace SoccerApp
                 {
                     DataTable dt = m_objUDTMatchSchedule.CurrentDataSet.Tables[1];
                     {
+                        if (isformloaded)
+                        {
+                            var rowsToUpdate = dt.AsEnumerable().FirstOrDefault(r => r.Field<string>("NAME") == ActiveMatch);
+                            if (rowsToUpdate != null)
+                            {
+                                rowsToUpdate["Active"] = true;
+                            }
+                        }
                         foreach (DataRow row in dt.Rows)
                         {
                             if ((bool)row["Active"])
@@ -749,7 +947,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -762,16 +960,16 @@ namespace SoccerApp
             Control ctl2 = null;
             try
             {
-                ctl1 = tableLayoutPanel1.GetControlFromPosition(0, 0);
-                ctl2 = tableLayoutPanel1.GetControlFromPosition(1, 0);
+                ctl1 = tableLayoutPanelPlayers.GetControlFromPosition(0, 0);
+                ctl2 = tableLayoutPanelPlayers.GetControlFromPosition(1, 0);
                 if (ctl1 != null)
                 {
-                    tableLayoutPanel1.Controls.Remove(ctl1);
+                    tableLayoutPanelPlayers.Controls.Remove(ctl1);
                     (ctl1 as IPlayer).DeleteSg();
                 }
                 if (ctl2 != null)
                 {
-                    tableLayoutPanel1.Controls.Remove(ctl2);
+                    tableLayoutPanelPlayers.Controls.Remove(ctl2);
                     (ctl2 as IPlayer).DeleteSg();
                 }
                 foreach (DataGridViewRow dr in dgvSelectPlayer.Rows)
@@ -785,7 +983,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -853,12 +1051,14 @@ namespace SoccerApp
         {
             try
             {
+                Cursor = Cursors.WaitCursor;
                 FillMatchDetails();
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
+            Cursor = Cursors.Default;
         }
 
         /// <summary>
@@ -881,7 +1081,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -916,12 +1116,16 @@ namespace SoccerApp
                         dgv.Cells[5].Value = selectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
                         SrNo++;
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Goal", lblHomeTeam.Text, selectedPlayer }, isformloaded);
+
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Goal", lblHomeTeam.Text, selectedPlayer, Convert.ToString(p.SelectedTeamId), Convert.ToString(p.SelectedPlayerId) }, isformloaded);
                         p = null;
                         UpdateMatchStats("HomeGoal", 1, "Match", cmbMatch.Text);
                         m_objUDTMatch.UpdateUdt(1, new string[] { "HomeScore" }, new string[] { lblHomeScore.Text }, "Name", cmbMatch.Text, isformloaded);
-                        m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
-                        m_objsceneHandler.SetMatchUdt();
+                        if (m_objsceneHandler != null)
+                        {
+                            m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
+                            m_objsceneHandler.SetMatchUdt();
+                        }
                     }
                     else
                     {
@@ -931,7 +1135,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }//end(btnhomeplus_Click)
 
@@ -949,13 +1153,16 @@ namespace SoccerApp
                     lblHomeScore.Text = (Convert.ToInt32(lblHomeScore.Text) - 1).ToString();
                     m_objUDTMatch.UpdateUdt(1, new string[] { "HomeScore" }, new string[] { lblHomeScore.Text }, "Name", cmbMatch.Text, isformloaded);
                     UpdateMatchStats("HomeGoal", -1, "Match", cmbMatch.Text);
-                    m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
-                    m_objsceneHandler.SetMatchUdt();
+                    if (m_objsceneHandler != null)
+                    {
+                        m_objsceneHandler.Hometeamscore = lblHomeScore.Text;
+                        m_objsceneHandler.SetMatchUdt();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }//end(btnHomeminus_Click)
 
@@ -990,12 +1197,15 @@ namespace SoccerApp
                         dgv.Cells[5].Value = selectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
                         SrNo++;
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Goal", lblAwayTeam.Text, selectedPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Goal", lblAwayTeam.Text, selectedPlayer, Convert.ToString(p.SelectedTeamId), Convert.ToString(p.SelectedPlayerId) }, isformloaded);
                         p = null;
                         m_objUDTMatch.UpdateUdt(1, new string[] { "AwayScore" }, new string[] { lblAwayScore.Text }, "Name", cmbMatch.Text, isformloaded);
                         UpdateMatchStats("AwayGoal", 1, "Match", cmbMatch.Text);
-                        m_objsceneHandler.Awayteamscore = lblAwayScore.Text;
-                        m_objsceneHandler.SetMatchUdt();
+                        if (m_objsceneHandler != null)
+                        {
+                            m_objsceneHandler.Awayteamscore = lblAwayScore.Text;
+                            m_objsceneHandler.SetMatchUdt();
+                        }
                     }
                     else
                     {
@@ -1005,7 +1215,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1029,7 +1239,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1052,7 +1262,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1075,7 +1285,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1098,7 +1308,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1112,51 +1322,64 @@ namespace SoccerApp
             try
             {
                 bool bneedStart = false;
-                if (m_objsceneHandler != null)
+
+                if (btnstartstop.Text == "Start")
                 {
-                    if (btnstartstop.Text == "Start")
+                    if (lblCounter.Text.Trim() == "00:00")
                     {
-                        if (lblCounter.Text.Trim() == "00:00")
+                        if (cmbMatchPart.Text != "Extra Time")
                         {
-                            if (cmbMatchPart.Text != "Extra Time")
+                            CountDownTarget = DateTime.Now.AddMinutes(45.00);
+                            if (m_objsceneHandler != null)
                             {
-                                CountDownTarget = DateTime.Now.AddMinutes(45.00);
-                                m_objsceneHandler.TimerAction("update", "45,0,0,0");
+                                m_objsceneHandler.TimerAction("update", "0,45,0,0");
                                 m_objsceneHandler.TimerAction("start", "");
-                                bneedStart = true;
                             }
-                            else
-                            {
-                                ExtraTimeEditor ete = new ExtraTimeEditor();
-                                ete.StartPosition = FormStartPosition.CenterParent;
-                                ete.ShowDialog();
-                                if (ete.Extratime > 0)
-                                {
-                                    m_objsceneHandler.TimerAction("updateextra", ete.Extratime + ",0,0,0");
-                                    m_objsceneHandler.TimerAction("extrain", "");
-                                    CountDownTarget = DateTime.Now.AddMinutes(ete.Extratime);
-                                    m_objsceneHandler.TimerAction("extrastart", "");
-                                    bneedStart = true;
-                                }
-                                ete = null;
-                            }
-                            MatchPartStartTime = DateTime.Now;
+                            bneedStart = true;
                         }
                         else
                         {
-                            bneedStart = true;
-                            m_objsceneHandler.TimerAction("start", "");
+                            ExtraTimeEditor ete = new ExtraTimeEditor();
+                            ete.StartPosition = FormStartPosition.CenterParent;
+                            ete.ShowDialog();
+                            if (ete.Extratime > 0)
+                            {
+                                if (m_objsceneHandler != null)
+                                {
+                                    m_objsceneHandler.TimerAction("updateextra", "0," + ete.Extratime + ",0,0");
+                                    m_objsceneHandler.TimerAction("extrain", "");
+                                }
+                                CountDownTarget = DateTime.Now.AddMinutes(ete.Extratime);
+                                if (m_objsceneHandler != null)
+                                {
+                                    m_objsceneHandler.TimerAction("extrastart", "");
+                                }
+                                bneedStart = true;
+                            }
+                            ete = null;
                         }
-                        if (bneedStart)
-                        {
-                            timer1.Enabled = true;
-                            timer1.Interval = 1000;
-                            timer1.Start();
-                            btnstartstop.Text = "Stop";
-                            EnabaleActions();
-                        }
+                        MatchPartStartTime = DateTime.Now;
                     }
                     else
+                    {
+                        bneedStart = true;
+                        if (m_objsceneHandler != null)
+                        {
+                            m_objsceneHandler.TimerAction("start", "");
+                        }
+                    }
+                    if (bneedStart)
+                    {
+                        timer1.Enabled = true;
+                        timer1.Interval = 1000;
+                        timer1.Start();
+                        btnstartstop.Text = "Stop";
+                        EnabaleActions();
+                    }
+                }
+                else
+                {
+                    if (m_objsceneHandler != null)
                     {
                         m_objsceneHandler.TimerAction("update", "0,0,0,0");
                         if (cmbMatchPart.Text != "Extra Time")
@@ -1168,15 +1391,16 @@ namespace SoccerApp
 
                             m_objsceneHandler.TimerAction("stopextratime", "");
                         }
-                        timer1.Stop();
-                        btnstartstop.Text = "Start";
-                        DisableActions();
                     }
+                    timer1.Stop();
+                    btnstartstop.Text = "Start";
+                    DisableActions();
                 }
+
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1222,7 +1446,7 @@ namespace SoccerApp
                         dgv.Cells[4].Value = sb.Team;
                         dgv.Cells[5].Value = sb.SelectedOutPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Substitution Out", sb.Team, sb.SelectedOutPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Substitution Out", sb.Team, sb.SelectedOutPlayer, Convert.ToString(sb.SelectedTeamId), Convert.ToString(sb.SelectedOutPlayerId) }, isformloaded);
                         SrNo++;
                         dgv = (DataGridViewRow)dgvMatchevents.Rows[0].Clone();
                         dgv.Cells[0].Value = SrNo;
@@ -1232,7 +1456,7 @@ namespace SoccerApp
                         dgv.Cells[4].Value = sb.Team;
                         dgv.Cells[5].Value = sb.SelectedInPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Substitution In", sb.Team, sb.SelectedInPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Substitution In", sb.Team, sb.SelectedInPlayer, Convert.ToString(sb.SelectedTeamId), Convert.ToString(sb.SelectedInPlayerId) }, isformloaded);
                         SrNo++;
                         sb = null;
                     }
@@ -1240,7 +1464,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1286,7 +1510,7 @@ namespace SoccerApp
                         dgv.Cells[4].Value = pd.Team;
                         dgv.Cells[5].Value = pd.SelectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Fouls", pd.Team, pd.SelectedPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Fouls", pd.Team, pd.SelectedPlayer, Convert.ToString(pd.SelectedTeamId), Convert.ToString(pd.SelectedPlayerId) }, isformloaded);
                         SrNo++;
                         string FoulTeam = "";
                         if (pd.Team == lblHomeTeam.Text)
@@ -1303,7 +1527,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1324,6 +1548,7 @@ namespace SoccerApp
                         ts = DateTime.Now.Subtract(MatchPartStartTime);
                     }
                     TeamSelection tms = new TeamSelection();
+                    tms.ObjUdtprovider = m_objUDTMatch;
                     tms.cmbTeam.Items.Add(lblHomeTeam.Text);
                     tms.cmbTeam.Items.Add(lblAwayTeam.Text);
                     tms.StartPosition = FormStartPosition.CenterParent;
@@ -1345,7 +1570,7 @@ namespace SoccerApp
                         dgv.Cells[4].Value = tms.SelectedTeam;
                         dgv.Cells[5].Value = "";
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Corner kicks", tms.SelectedTeam, "" }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Corner kicks", tms.SelectedTeam, "", Convert.ToString(tms.SelectedTeamId) }, isformloaded);
                         SrNo++;
 
                         string FoulTeam = "";
@@ -1364,7 +1589,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1410,7 +1635,7 @@ namespace SoccerApp
                         dgv.Cells[4].Value = pd.Team;
                         dgv.Cells[5].Value = pd.SelectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Shots On Goal", pd.Team, pd.SelectedPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Shots On Goal", pd.Team, pd.SelectedPlayer, Convert.ToString(pd.SelectedTeamId), Convert.ToString(pd.SelectedPlayerId) }, isformloaded);
                         SrNo++;
                         string FoulTeam = "";
                         if (pd.Team == lblHomeTeam.Text)
@@ -1427,7 +1652,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
 
         }
@@ -1474,7 +1699,7 @@ namespace SoccerApp
                         dgv.Cells[4].Value = pd.Team;
                         dgv.Cells[5].Value = pd.SelectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Shots Off Goal", pd.Team, pd.SelectedPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Shots Off Goal", pd.Team, pd.SelectedPlayer, Convert.ToString(pd.SelectedTeamId), Convert.ToString(pd.SelectedPlayerId) }, isformloaded);
                         SrNo++;
                         string FoulTeam = "";
                         if (pd.Team == lblHomeTeam.Text)
@@ -1491,7 +1716,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1537,14 +1762,14 @@ namespace SoccerApp
                         dgv.Cells[4].Value = pd.Team;
                         dgv.Cells[5].Value = pd.SelectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Yellow Cards", pd.Team, pd.SelectedPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Yellow Cards", pd.Team, pd.SelectedPlayer, Convert.ToString(pd.SelectedTeamId), Convert.ToString(pd.SelectedPlayerId) }, isformloaded);
                         SrNo++;
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1590,14 +1815,14 @@ namespace SoccerApp
                         dgv.Cells[4].Value = pd.Team;
                         dgv.Cells[5].Value = pd.SelectedPlayer;
                         dgvMatchevents.Rows.Add(dgv);
-                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Red Cards", pd.Team, pd.SelectedPlayer }, isformloaded);
+                        m_objUDTMatch.InsertUdt(5, new string[] { "EventID", "MatchPart", "Time", "EventType", "Team", "Player", "_Team_hidden", "_Player_hidden" }, new string[] { SrNo.ToString(), cmbMatchPart.Text, dgv.Cells[1].Value.ToString(), "Red Cards", pd.Team, pd.SelectedPlayer, Convert.ToString(pd.SelectedTeamId), Convert.ToString(pd.SelectedPlayerId) }, isformloaded);
                         SrNo++;
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
 
         }
@@ -1619,7 +1844,7 @@ namespace SoccerApp
 
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1637,23 +1862,27 @@ namespace SoccerApp
                 {
                     int currentcolumnclicked = e.ColumnIndex;
                     int currentrowclicked = e.RowIndex;
+                    bool val;
+                    bool.TryParse(Convert.ToString(dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].Value), out val);
                     foreach (DataGridViewRow dr in dgvSelectPlayer.Rows)
                     {
                         dr.Cells[currentcolumnclicked].Value = false;
                     }
-                    dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].Value = true;
-                    dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].ReadOnly = true;
+                    dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].Value = val;
+                    //dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].ReadOnly = true;
                 }
 
                 if (dgvSelectPlayer.Columns.IndexOf(dgvSelectPlayer.Columns["Column3"]) == e.ColumnIndex)
                 {
                     int currentcolumnclicked = e.ColumnIndex;
                     int currentrowclicked = e.RowIndex;
+                    bool val;
+                    bool.TryParse(Convert.ToString(dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].Value), out val);
                     foreach (DataGridViewRow dr in dgvSelectPlayer.Rows)
                     {
                         dr.Cells[currentcolumnclicked].Value = false;
                     }
-                    dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].Value = true;
+                    dgvSelectPlayer.CurrentRow.Cells[currentcolumnclicked].Value = val;
                 }
 
                 if (e.ColumnIndex == dgvSelectPlayer.Columns["Column2"].Index)
@@ -1663,6 +1892,17 @@ namespace SoccerApp
                         string sTemplate = dgvSelectPlayer.Rows[e.RowIndex].Cells["Name"].Value.ToString();
                         string sCol = "Column2";
                         GetTemplate(sTemplate, sCol);
+                    }
+                    else
+                    {
+                        var ctl = tableLayoutPanelPlayers.GetControlFromPosition(0, 0);
+                        if (ctl != null) // Already control present there
+                        {
+                            //First play out the graphic.
+                            //then delete the gfx                            
+                            tableLayoutPanelPlayers.Controls.Remove(ctl);
+                            (ctl as IPlayer).DeleteSg();
+                        }
                     }
                 }
 
@@ -1674,12 +1914,23 @@ namespace SoccerApp
                         string sCol2 = "Column3";
                         GetTemplate(sTemplate, sCol2);
                     }
+                    else
+                    {
+                        var ctl2 = tableLayoutPanelPlayers.GetControlFromPosition(1, 0);
+                        if (ctl2 != null) // Already control present there
+                        {
+                            //First play out the graphic.
+                            //then delete the gfx
+                            tableLayoutPanelPlayers.Controls.Remove(ctl2);
+                            (ctl2 as IPlayer).DeleteSg();
+                        }
+                    }
                 }
             }
 
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1702,8 +1953,8 @@ namespace SoccerApp
                 case SHOTBOXMSG.SGDELETED:
                     if (m_objplayertodelete != null && m_objplayertodelete.Equals(sender as IPlayer))
                     {
-                        TableLayoutPanelCellPosition position = tableLayoutPanel1.GetPositionFromControl(m_objplayertodelete as Form);
-                        tableLayoutPanel1.Controls.Remove(m_objplayertodelete as Form);
+                        TableLayoutPanelCellPosition position = tableLayoutPanelPlayers.GetPositionFromControl(m_objplayertodelete as Form);
+                        tableLayoutPanelPlayers.Controls.Remove(m_objplayertodelete as Form);
                         switch (position.Column)
                         {
                             case 0:
@@ -1745,7 +1996,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -1756,29 +2007,102 @@ namespace SoccerApp
         /// <param name="e"></param>
         private void BtnLoadBG_Click(object sender, EventArgs e)
         {
+            Cursor = Cursors.WaitCursor;
             try
             {
-                switch (BtnLoadBG.Text)
+                if (m_objsceneHandler != null)
                 {
-                    case "Load BG":
-                        BtnLoadBG.Text = "Unload BG";
-                        ScenInfo si = m_lstSceneCollection.Where(s => s.Description == "bg").FirstOrDefault();
-                        Beesys.Wasp.Workflow.TemplateInfo tempinfo = objPlayergetter.GetPlayerInfo(si.Id);
-                        m_objsceneHandler.LoadBackground(tempinfo, si.Id);
-                        break;
-                    case "Unload BG":
-                        BtnLoadBG.Text = "Load BG";
-                        m_objsceneHandler.UnloadBackground();
-                        break;
+                    switch (BtnLoadBG.Text)
+                    {
+                        case "Load BG":
+                            WriteTrace("Load BG");
+                            BtnLoadBG.Text = "Unload BG";
+                            ScenInfo si = m_lstSceneCollection.Where(s => s.Description == "bg").FirstOrDefault();
+                            Beesys.Wasp.Workflow.TemplateInfo tempinfo = objPlayergetter.GetPlayerInfo(si.Id);
+                            m_objsceneHandler.LoadBackground(tempinfo, si.Id);
+                            break;
+                        case "Unload BG":
+                            WriteTrace("Unload BG");
+                            BtnLoadBG.Text = "Load BG";
+                            m_objsceneHandler.UnloadBackground();
+                            break;
 
+                    }
                 }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
+            Cursor = Cursors.Default;
         }
 
         #endregion
+
+        private void WriteTrace(string message)
+        {
+            System.Diagnostics.Debug.WriteLine("SOCCER APP-->" + message);
+        }
+
+        private void cmbxEngines_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            WriteTrace("cmbxEngines_SelectedIndexChanged");
+            if (m_objsceneHandler != null)
+            {
+                m_objsceneHandler.Dispose();
+                m_objsceneHandler = null;
+            }
+            string selectedValue = Convert.ToString(cmbxEngines.SelectedValue);
+            WriteTrace("cmbxEngines_SelectedIndexChanged selectedValue->" + selectedValue);
+            if (selectedValue != "--Select--")
+            {
+                WriteTrace("cmbxEngines_SelectedIndexChanged selectedValue != --Select--");
+                EngineData selectedEngine = lstEngines.FirstOrDefault(c => c.Name.Equals(cmbxEngines.SelectedValue));
+                if (selectedEngine != null)
+                {
+                    WriteTrace("cmbxEngines_SelectedIndexChanged");
+                    ConfigHandler.Engine = selectedEngine;
+                    InitSceneHandler();
+                }
+            }
+
+        }
+
+
+
+    }
+
+    public class EngineData
+    {
+        public string Name { get; set; }
+
+        public string IP { get; set; }
+
+        public string WcfUrl { get; set; }
+
+        public string TcpUrl { get { return GetUrl("tcp"); } }
+
+        public string NamedpipeUrl { get { return GetUrl("namedpipe"); } }
+
+        string GetUrl(string type)
+        {
+            string url = string.Empty;
+
+            if (!string.IsNullOrEmpty(WcfUrl))
+            {
+                string[] typeSplitter = WcfUrl.Split(';');
+                if (typeSplitter.Length > 1)
+                {
+                    foreach (string t in typeSplitter)
+                    {
+                        if (t.ToLower().Trim().StartsWith(type))
+                        {
+                            url = t.Split('~')[1];
+                        }
+                    }
+                }
+            }
+            return url;
+        }
     }
 }

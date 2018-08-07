@@ -20,6 +20,12 @@ namespace SoccerApp
         public string SelectedOutPlayer { get; set; }
         public bool IsTeamSelected = false;
 
+        public object SelectedTeamId { get; set; }
+
+        public object SelectedInPlayerId { get; set; }
+
+        public object SelectedOutPlayerId { get; set; }
+
         public Substitution()
         {
             InitializeComponent();
@@ -32,6 +38,7 @@ namespace SoccerApp
             DataRow drTeam = ObjUdtprovider.CurrentDataSet.Tables[2].Select("Name = '" + Team + "'").FirstOrDefault();
             if (drTeam != null)
             {
+                SelectedTeamId = drTeam["T24_ID"];
                 DataRow[] drPlayers = ObjUdtprovider.CurrentDataSet.Tables[3].Select("T24_ID = '" + drTeam["T24_ID"] + "' AND Playing=true");
                 cmbIn.Items.Clear();
                 cmbOut.Items.Clear();
@@ -79,6 +86,11 @@ namespace SoccerApp
         private void cmbOut_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelectedOutPlayer = cmbOut.Text;
+            DataRow drPlayer = ObjUdtprovider.CurrentDataSet.Tables[3].Select("T24_ID = '" + SelectedTeamId + "' AND Playing=true AND [First Name]='" + SelectedOutPlayer + "'").FirstOrDefault();
+            if (drPlayer != null)
+            {
+                SelectedOutPlayerId = drPlayer["T25_ID"];
+            }
         }
 
         private void cmbJerIN_SelectedIndexChanged(object sender, EventArgs e)
@@ -90,6 +102,11 @@ namespace SoccerApp
         {
             cmbJerIN.SelectedIndex = cmbIn.SelectedIndex;
             SelectedInPlayer = cmbIn.Text;
+            DataRow drPlayer = ObjUdtprovider.CurrentDataSet.Tables[3].Select("T24_ID = '" + SelectedTeamId + "' AND Playing=true AND [First Name]='" + SelectedInPlayer + "'").FirstOrDefault();
+            if (drPlayer != null)
+            {
+                SelectedInPlayerId = drPlayer["T25_ID"];
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

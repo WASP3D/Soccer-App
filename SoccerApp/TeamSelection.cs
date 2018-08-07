@@ -14,6 +14,8 @@ namespace SoccerApp
     {
         public string SelectedTeam { get; set; }
         public bool IsTeamSelected = false;
+        public object SelectedTeamId { get; set; }
+        public UDTProvider.UdtProvider ObjUdtprovider { get; set; }
 
         public TeamSelection()
         {
@@ -23,7 +25,12 @@ namespace SoccerApp
         private void cmbTeam_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelectedTeam = cmbTeam.Text;
-            if(!string.IsNullOrEmpty(cmbTeam.Text))
+            DataRow drTeam = ObjUdtprovider.CurrentDataSet.Tables[2].Select("Name = '" + SelectedTeam + "'").FirstOrDefault();
+            if (drTeam != null)
+            {
+                SelectedTeamId = drTeam["T24_ID"];
+            }
+            if (!string.IsNullOrEmpty(cmbTeam.Text))
             {
                 IsTeamSelected = true;
             }

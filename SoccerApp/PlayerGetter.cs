@@ -34,7 +34,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -111,7 +111,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
 
             return m_objTempDtls;
@@ -178,7 +178,7 @@ namespace SoccerApp
             }//end try
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
                 return objType;
             }//end catch
             finally
@@ -189,6 +189,11 @@ namespace SoccerApp
                 objAsmbly = null;
                 xnAtchmntInfo = null;
             }//end (finally)
+        }
+
+        private void WriteTrace(string message)
+        {
+            System.Diagnostics.Debug.WriteLine("SOCCER APP-->" + message);
         }
 
     }

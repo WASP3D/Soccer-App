@@ -24,7 +24,7 @@ namespace SoccerApp
         public string Hometeamscore = string.Empty;
         public string Awayteamscore = string.Empty;
 
-        private const string m_surlformat = "net.tcp://{0}:{1}/TcpBinding/WcfTcpLink";
+        //private const string m_surlformat = "net.tcp://{0}:{1}/TcpBinding/WcfTcpLink";
         private string m_serverurl = string.Empty;
         private string m_scorebugscenepath = string.Empty;
         private IPlayer objBGPlayer = null;
@@ -49,19 +49,22 @@ namespace SoccerApp
         /// </summary>
         public void Initialize()
         {
+            WriteTrace("Initialize");
             IsInitialized = false;
-            m_serverurl = string.Format(m_surlformat, ConfigurationManager.AppSettings["stingserverip"], ConfigurationManager.AppSettings["stingserverport"]);
-            if (File.Exists(ConfigurationManager.AppSettings["scorebugscenepath"]))
+            m_serverurl = ConfigHandler.Engine!=null? ConfigHandler.Engine.TcpUrl:string.Empty;
+            WriteTrace("Initialize m_serverurl->"+ m_serverurl);
+            if (File.Exists(ConfigHandler.AppSettings.Settings["scorebugscenepath"].Value))
             {
-                m_scorebugscenepath = ConfigurationManager.AppSettings["scorebugscenepath"];
+                m_scorebugscenepath = ConfigHandler.AppSettings.Settings["scorebugscenepath"].Value;
             }
             else if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "ScoreBug.w3d")))
             {
                 m_scorebugscenepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "ScoreBug.w3d");
             }
 
-            if (!string.IsNullOrEmpty(m_scorebugscenepath) && ConfigurationManager.AppSettings["stingserverip"] != null)
+            if (!string.IsNullOrEmpty(m_scorebugscenepath) && !string.IsNullOrEmpty(m_serverurl))
             {
+                WriteTrace("!string.IsNullOrEmpty(m_scorebugscenepath) && !string.IsNullOrEmpty(m_serverurl)");
                 string sLinkID = string.Empty;
                 LinkManager objLinkManager = new LinkManager();
                 AppLink = objLinkManager.GetLink(LINKTYPE.TCP, out sLinkID);
@@ -99,7 +102,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -110,7 +113,9 @@ namespace SoccerApp
         {
             if (objBGPlayer != null)
             {
-                objBGPlayer.PlayActionSet("Unload");
+                string actionsetname = ConfigHandler.AppSettings.Settings["unloadactionsetname"].Value;
+                WriteTrace("Calling action set "+ actionsetname);
+                objBGPlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["unloadactionsetname"].Value);
             }
         }
 
@@ -122,6 +127,7 @@ namespace SoccerApp
             string sXml = string.Empty;
             string sShotBoxID = null;
             bool isTicker;
+            WriteTrace("LoadScene");
             sXml = Util.getSGFromWSL(m_scorebugscenepath);
             string filetype = Path.GetExtension(m_scorebugscenepath).Split(new string[] { "." }, StringSplitOptions.None)[1];
             if (!string.IsNullOrEmpty(sXml))
@@ -139,7 +145,7 @@ namespace SoccerApp
 
                     objScorePlayer.OnShotBoxStatus += objPlayer1_OnShotBoxStatus;
                     objScorePlayer.OnShotBoxControllerStatus += objPlayer1_OnShotBoxStatus;
-                    objScorePlayer.Prepare(m_serverurl, 10, RENDERMODE.PROGRAM);
+                    objScorePlayer.Prepare(m_serverurl, 0, RENDERMODE.PROGRAM);
                 }//end (if)
             }
         }
@@ -152,8 +158,8 @@ namespace SoccerApp
         {
             if (objScorePlayer != null)
             {
-                System.Diagnostics.Debug.WriteLine("SetMatchUDT " + Hometeamshortname + " VS " + Awayteamshortname);
-                System.Diagnostics.Debug.WriteLine("SetMatchUDT " + Hometeamscore + " : " + Awayteamscore);
+                WriteTrace("SetMatchUDT " + Hometeamshortname + " VS " + Awayteamshortname);
+                WriteTrace("SetMatchUDT " + Hometeamscore + " : " + Awayteamscore);
                 TagData tg = new TagData();
                 tg.UserTags = new string[] { "Hometeamscore", "Awayteamscore", "Hometeamname", "Awayteamname" };
                 tg.Values = new string[] { Hometeamscore, Awayteamscore, Hometeamshortname, Awayteamshortname };
@@ -182,10 +188,10 @@ namespace SoccerApp
                     {
                         if (shotboxobj.Equals(objScorePlayer))
                         {
-                            System.Diagnostics.Debug.WriteLine("objPlayer1_OnShotBoxStatus Scoreplayer Scene prepared,Calling SetMatchUdt...");
+                            WriteTrace("objPlayer1_OnShotBoxStatus Scoreplayer Scene prepared,Calling SetMatchUdt...");
                             SetMatchUdt();
                         }
-                        System.Diagnostics.Debug.WriteLine("objPlayer1_OnShotBoxStatus Scoreplayer Scene prepared,Calling Play..");
+                        WriteTrace("objPlayer1_OnShotBoxStatus Scoreplayer Scene prepared,Calling Play..");
                         shotboxobj.Play(true, true);
                     }
                     else
@@ -195,7 +201,7 @@ namespace SoccerApp
                             IPlayer playerobj = sender as IPlayer;
                             if (playerobj != null)
                             {
-                                System.Diagnostics.Debug.WriteLine("objPlayer1_OnShotBoxStatus BackGround Scene prepared,Calling Play...");
+                                WriteTrace("objPlayer1_OnShotBoxStatus BackGround Scene prepared,Calling Play...");
                                 playerobj.Play(true, true);
                             }
                         }
@@ -204,13 +210,13 @@ namespace SoccerApp
             }
             else if (e.SHOTBOXRESPONSE == SHOTBOXMSG.PLAYCOMPLETE)
             {
-                System.Diagnostics.Debug.WriteLine("objPlayer1_OnShotBoxStatus SHOTBOXMSG.PLAYCOMPLETE event..");
+                WriteTrace("objPlayer1_OnShotBoxStatus SHOTBOXMSG.PLAYCOMPLETE event..");
                 if (sender is ShotBox)
                 {
                     ShotBox shotboxobj = sender as ShotBox;
                     if (shotboxobj.Equals(objScorePlayer))
                     {
-                        System.Diagnostics.Debug.WriteLine("objPlayer1_OnShotBoxStatus Scoreplayer Scene playcomplete,Calling DeleteSg...");
+                        WriteTrace("objPlayer1_OnShotBoxStatus Scoreplayer Scene playcomplete,Calling DeleteSg...");
                         shotboxobj.DeleteSg();
                     }
                 }
@@ -219,7 +225,7 @@ namespace SoccerApp
                     IPlayer playerobj = sender as IPlayer;
                     if (playerobj.Equals(objBGPlayer))
                     {
-                        System.Diagnostics.Debug.WriteLine("objPlayer1_OnShotBoxStatus BackGround Scene playcomplete,Calling DeleteSg...");
+                        WriteTrace("objPlayer1_OnShotBoxStatus BackGround Scene playcomplete,Calling DeleteSg...");
                         playerobj.DeleteSg();
                     }
                 }
@@ -237,6 +243,7 @@ namespace SoccerApp
 
         void objLink_OnEngineConnected(object sender, EngineArgs e)
         {
+            WriteTrace("objLink_OnEngineConnected");
             if (e.ENGINEIP == m_serverurl)
             {
                 IsInitialized = true;
@@ -252,34 +259,36 @@ namespace SoccerApp
                 switch (actiontype.ToLower(CultureInfo.InvariantCulture))
                 {
                     case "start":
-                        objScorePlayer.PlayActionSet(ConfigurationManager.AppSettings["counterstartaction"]);
+                        objScorePlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["counterstartaction"].Value);
                         break;
                     case "stop":
-                        objScorePlayer.PlayActionSet(ConfigurationManager.AppSettings["counterstopaction"]);
+                        objScorePlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["counterstopaction"].Value);
                         break;
                     case "update":
-                        tg.UserTags = new string[] { ConfigurationManager.AppSettings["counterusertag"] };
+                        tg.UserTags = new string[] { ConfigHandler.AppSettings.Settings["counterusertag"].Value };
                         tg.Values = new string[] { counter };
                         tg.IsOnAirUpdate = true;
                         tg.Indexes = new string[] { "0" };
                         objScorePlayer.UpdateSceneGraph(tg);
                         break;
                     case "updateextra":
-                        tg.UserTags = new string[] { ConfigurationManager.AppSettings["extratimeusertag"] };
+                        tg.UserTags = new string[] { ConfigHandler.AppSettings.Settings["extratimeusertag"].Value };
                         tg.Values = new string[] { counter };
+                        tg.IsOnAirUpdate = true;
+                        tg.Indexes = new string[] { "0" };
                         objScorePlayer.UpdateSceneGraph(tg);
                         break;
                     case "extrain":
-                        objScorePlayer.PlayActionSet(ConfigurationManager.AppSettings["extratimein"]);
+                        objScorePlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["extratimein"].Value);
                         break;
                     case "extraout":
-                        objScorePlayer.PlayActionSet(ConfigurationManager.AppSettings["extratimeout"]);
+                        objScorePlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["extratimeout"].Value);
                         break;
                     case "extrastart":
-                        objScorePlayer.PlayActionSet(ConfigurationManager.AppSettings["startextratime"]);
+                        objScorePlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["startextratime"].Value);
                         break;
                     case "extrastop":
-                        objScorePlayer.PlayActionSet(ConfigurationManager.AppSettings["stopextratime"]);
+                        objScorePlayer.PlayActionSet(ConfigHandler.AppSettings.Settings["stopextratime"].Value);
                         break;
                     default:
                         break;
@@ -289,7 +298,7 @@ namespace SoccerApp
             }
             catch (Exception ex)
             {
-                LogWriter.WriteLog(ex);
+                LogWriter.WriteLog(ex); WriteTrace(ex.ToString());
             }
         }
 
@@ -319,6 +328,10 @@ namespace SoccerApp
                 FileHandler.Dispose();
                 FileHandler = null;
             }
+        }
+        private void WriteTrace(string message)
+        {
+            System.Diagnostics.Debug.WriteLine("SOCCER APP-->" + message);
         }
     }
 }

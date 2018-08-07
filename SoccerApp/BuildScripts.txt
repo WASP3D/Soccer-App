@@ -1,0 +1,12 @@
+﻿if not exist ..\..\OutPut mkdir ..\..\OutPut
+if not exist ..\..\OutPut\SoccerAppAddin mkdir ..\..\OutPut\SoccerAppAddin
+copy "$(ProjectDir)Addin Utils\License" "..\..\OutPut\SoccerAppAddin\License"
+copy "$(TargetDir)SoccerApp.dll" "..\..\OutPut\SoccerAppAddin\SoccerApp.dll"
+copy "$(TargetDir)SoccerApp.config" "..\..\OutPut\SoccerAppAddin\SoccerApp.config"
+copy "$(TargetDir)templates.xml" "..\..\OutPut\SoccerAppAddin\templates.xml"
+copy "$(TargetDir)UDTProvider.dll" "..\..\OutPut\SoccerAppAddin\UDTProvider.dll"
+if not exist ..\..\OutPut\Resources mkdir ..\..\OutPut\Resources
+if not exist ..\..\OutPut\Resources\SoccerScenes mkdir ..\..\OutPut\Resources\SoccerScenes
+if not exist ..\..\OutPut\Resources\UDT mkdir ..\..\OutPut\Resources\UDT
+copy "..\Resources\SoccerScenes\*.w3d" "..\..\OutPut\Resources\SoccerScenes\"
+copy "..\Resources\UDT\*.udt" "..\..\OutPut\Resources\UDT\"

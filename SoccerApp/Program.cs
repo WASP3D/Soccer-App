@@ -1,6 +1,8 @@
-﻿using System;
+﻿using BeeSys.Shared.Library;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,6 +17,13 @@ namespace SoccerApp
         [STAThread]
         static void Main()
         {
+            string sPath = Environment.GetEnvironmentVariable("Wasp3.5", EnvironmentVariableTarget.Machine);
+
+            AssemblyResolver.AddPath
+                    (
+                        Path.Combine(sPath, "Shared Resources")
+                    );
+
             Process[] result = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
             if (result.Length > 1)
             {
@@ -24,9 +33,6 @@ namespace SoccerApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SoccerApp());
-            //Issue #1
         }
-
-        
     }
 }

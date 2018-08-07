@@ -39,11 +39,14 @@ namespace UDTProvider
         private string UDTDATASESSIONID = string.Empty;
         private UdtMetaDataInfo _mudtinfo = null;
         private bool IsClosing = false;
+        List<UdtInfo> allUdtes = null;
+        string ServiceUrlKey = string.Empty;
 
         #endregion
 
-        public UdtProvider()
+        public UdtProvider(string serviceurlkey)
         {
+            ServiceUrlKey = serviceurlkey;
             CommonPath = Environment.GetEnvironmentVariable("Wasp3.5");
             CurrentDataSet = new DataSet("Soccer");
             UdtFilters = new Dictionary<string, UdtFilter>();
@@ -60,7 +63,7 @@ namespace UDTProvider
             System.Diagnostics.Debug.WriteLine("InitializeConnection configfile:" + configfile);
             XDocument xdoc = XDocument.Load(configfile);
             var url = from lv1 in xdoc.Descendants("add")
-                      where lv1.Attribute("key").Value == "LOCALMANAGERURL"
+                      where lv1.Attribute("key").Value == ServiceUrlKey
                       select lv1.Attribute("value").Value;
             _objRemoteHelper = new CRemoteHelper(url.ElementAt(0));
             ConnectionInfo _objConnection = _objRemoteHelper.CheckConnection();
@@ -85,11 +88,24 @@ namespace UDTProvider
                 FilterChanged(changedParameter);
         }
 
-        public void InitializeUdt(string UdtName)
+        public bool InitializeUdt(string UdtName)
         {
+            bool bResult = false;
             System.Diagnostics.Debug.WriteLine("InitializeUDT UdtName:" + UdtName);
-            LoadUdt(UdtName);
-            CurrentDataSet = GetUdtDataset(CurrentUdt);
+            if (allUdtes == null)
+            {
+                allUdtes = _mObjUdtHandler.GetAllUdt();
+            }
+            if (allUdtes != null)
+            {
+                LoadUdt(UdtName);
+                CurrentDataSet = GetUdtDataset(CurrentUdt);
+                bResult = true;
+            }
+            else
+                bResult = false;
+
+            return bResult;
         }
 
         public void RefreshUdt(string UdtName)
@@ -184,7 +200,31 @@ namespace UDTProvider
             if (dr.Table.Columns.Count > 1 && dr.Table.Columns[1].ColumnName.Contains("_ID") && dtTable.Rows.Count > 0)
             {
                 var parentkey = dtTable.Rows[0][1];
+                string parentTable = string.Empty;
+                if (string.IsNullOrEmpty(Convert.ToString(parentkey)))
+                {
+                    for (int i = 0; i < CurrentDataSet.Relations.Count; i++)
+                    {
+                        if (CurrentDataSet.Relations[i].ChildTable.TableName == dr.Table.TableName)
+                        {
+                            parentTable = CurrentDataSet.Relations[i].ParentTable.TableName;
+                            break;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(parentTable))
+                    {
+                        DataTable dtParent = CurrentDataSet.Tables[parentTable];
+                        string columnName = "T" + parentTable + "_ID";
+                        if (dtParent != null && dtParent.Rows.Count > 0 && dtParent.Columns.Contains(columnName))
+                        {
+                            parentkey = dtParent.Rows[0][columnName];
+
+                        }
+                    }
+                }
+
                 dr[1] = parentkey;
+
             }
             if (dr.Table.Columns.Contains("Visibility") && string.IsNullOrEmpty(Convert.ToString(dr["Visibility"])))
             {
@@ -282,7 +322,7 @@ namespace UDTProvider
             try
             {
                 System.Diagnostics.Debug.WriteLine("LoadUDT udtname:" + udtname);
-                List<UdtInfo> allUdtes = _mObjUdtHandler.GetAllUdt();
+
                 var args = allUdtes.FirstOrDefault(x => x.Udtname.Equals(udtname));
                 System.Diagnostics.Debug.WriteLine("LoadUDT 1");
                 if (args != null)
