@@ -1,0 +1,10 @@
+<Deployment signature="e042fcfcdcb70d11dd043940eb2718f7423abb7e7621cafe213dfefcb2f8fff6fdfb8a8c048597253f20200d4546ee63e5738aac830270ae0446329ed07a2cf2">
+<license ver="1.0">
+		<grant>
+			<principal name="Beehive Systems" userid="{DE4CA66F-F4B4-490e-A057-D969D10C0B42}" licesenseid="434367" level="O"/>
+			<rights product="BeehiveSystems" permissions="R for Read Only W for Read and Write"/>
+			<condition start="start date time incase the template is valid for particular date interval" end=" end date tine incase the template is valid for particular date interval"/>
+			<addininfo  name="Template" dllName="SoccerApp.dll" class="SoccerApp.Addin_Utils.SoccerAppAddin" />
+		</grant>
+	</license>
+</Deployment>

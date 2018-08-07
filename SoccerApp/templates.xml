@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <templates>
-  <template name="Field Formation.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Field Formation.w3d" description="Field Formation" ismanual="true"/>
-  <template name="Match Lowerthird.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Match Lowerthird.w3d" description="Match Lowerthird" ismanual="true"/>
-  <template name="Match Schedule.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Match Schedule.w3d" description="Match Schedule" ismanual="true"/>
-  <template name="Team Line UP.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Team Line Up.w3d" description="Team Line UP" ismanual="true"/>
-  <template name="Head To Head.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Head To Head.w3d" description="Head To Head" ismanual="true"/>
-  <template name="Match Score_LT.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Match Score_LT.w3d" description="Match Score_LT" ismanual="true"/>
-  <template name="Official Band_LT.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Official Band_LT.w3d" description="Official Band_LT" ismanual="true"/>
-  <template name="Refree Band.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Refree Band.w3d" description="Refree Band" ismanual="true"/>
-  <template name="Match FT Summary Statistics.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Match FT Summary Statistics.w3d" description="Match FT Summary Statistics" ismanual="true"/>
-  <template name="Team Line UP_Players.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Team Line Up_Players.w3d" description="Team Line UP_Players" ismanual="true"/>
-  <template name="Player Profile.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Player Profile.w3d" description="Player Profile" ismanual="true"/>
-  <template name="Team Roster.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\Team Roster.w3d" description="Team Roster" ismanual="true"/>
-  <template name="League Table.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\League Table.w3d" description="League Table" ismanual="true"/>
-  <template name="BackGround.wsp" id="E:\GitSolutions\Version3.8.1-Github\SoccerApp\Resources\SoccerScenes\BackGround.w3d" description="bg" ismanual="false"/>
+  <template name="Field Formation.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Field Formation.wsp" description="Field Formation" ismanual="true"/>
+  <template name="Match Lowerthird.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Match Lowerthird.wsp" description="Match Lowerthird" ismanual="true"/>
+  <template name="Match Schedule.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Match Schedule.wsp" description="Match Schedule" ismanual="true"/>
+  <template name="Team Line UP.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Team Line Up.wsp" description="Team Line UP" ismanual="true"/>
+  <template name="Head To Head.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Head To Head.wsp" description="Head To Head" ismanual="true"/>
+  <template name="Match Score_LT.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Match Score_LT.wsp" description="Match Score_LT" ismanual="true"/>
+  <template name="Official Band_LT.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Official Band_LT.wsp" description="Official Band_LT" ismanual="true"/>
+  <template name="Refree Band.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Refree Band.wsp" description="Refree Band" ismanual="true"/>
+  <template name="Match FT Summary Statistics.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Match FT Summary Statistics.wsp" description="Match FT Summary Statistics" ismanual="true"/>
+  <template name="Team Line UP_Players.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Team Line Up_Players.wsp" description="Team Line UP_Players" ismanual="true"/>
+  <template name="Player Profile.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Player Profile.wsp" description="Player Profile" ismanual="true"/>
+  <template name="Team Roster.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Team Roster.wsp" description="Team Roster" ismanual="true"/>
+  <template name="League Table.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\League Table.wsp" description="League Table" ismanual="true"/>
+  <template name="BackGround.wsp" id="D:\BeeSys\WaspLoader\Soccer New Deisgn\Background.wsp" description="bg" ismanual="false"/>
   <!--<template name="TestScene.wsp" id="4bc95beb-3c9c-4295-9af9-fe670e4f4c9b" description="matchevent" ismanual="false"/>-->
 </templates>

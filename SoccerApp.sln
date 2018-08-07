@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoccerApp", "SoccerApp\SoccerApp.csproj", "{C8A2585A-06F3-449B-906B-0F130032B9EB}"
 EndProject
@@ -69,6 +69,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 		Libraries\XmlDiffPatch.dll = Libraries\XmlDiffPatch.dll
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoccerWindowsApp", "SoccerWindowsApp\SoccerWindowsApp.csproj", "{03B86A59-A02B-48A3-9A9A-C23A60DC47CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{BFA81BC4-2ED7-48ED-935B-045265A4D60C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFA81BC4-2ED7-48ED-935B-045265A4D60C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFA81BC4-2ED7-48ED-935B-045265A4D60C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03B86A59-A02B-48A3-9A9A-C23A60DC47CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03B86A59-A02B-48A3-9A9A-C23A60DC47CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03B86A59-A02B-48A3-9A9A-C23A60DC47CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03B86A59-A02B-48A3-9A9A-C23A60DC47CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
